@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>שיווק דיגיטלי וסושיאל מדיא מנצח — סרטים חינוכים</title>
+    <meta name="description" content="הפכו את הרשתות החברתיות שלכם למנוע צמיחה עם אסטרטגיות שיווק דיגיטלי מתקדמות. התחילו לראות תוצאות אמיתיות עוד היום עם הפקות וידאו חינוכיות.">
+    <meta name="keywords" content="social media marketing, digital marketing company, שיווק דיגיטלי, סרטים חינוכיים, תוכן וידאו">
+    
+    <!-- Zappy Analytics -->
+<script>
+(function() {
+  'use strict';
+  
+  // Configuration
+  var config = {
+    websiteId: 'fb2ade29-b6f8-4de1-8860-af0dbb47b102',
+    apiUrl: 'https://api.zappy5.com/api/analytics/track',
+    sessionDuration: 30 * 60 * 1000, // 30 minutes
+    visitorDuration: 30 * 24 * 60 * 60 * 1000, // 30 days
+    trackPageViews: true,
+    trackClicks: true,
+    trackFormSubmissions: true
+  };
+  
+  // Generate or retrieve persistent visitor ID (30 days)
+  function getVisitorId() {
+    var visitorKey = 'zappy_visitor_' + config.websiteId;
+    var visitor = null;
+    
+    try {
+      visitor = localStorage.getItem(visitorKey);
+      if (visitor) {
+        var visitorData = JSON.parse(visitor);
+        var now = Date.now();
+        
+        // Check if visitor ID is still valid (30 days)
+        if (now - visitorData.created < config.visitorDuration) {
+          // Update last seen timestamp
+          visitorData.lastSeen = now;
+          localStorage.setItem(visitorKey, JSON.stringify(visitorData));
+          return visitorData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: LocalStorage not available');
+    }
+    
+    // Generate new visitor ID
+    var newVisitorId = 'zv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      localStorage.setItem(visitorKey, JSON.stringify({
+        id: newVisitorId,
+        created: Date.now(),
+        lastSeen: Date.now()
+      }));
+    } catch (e) {
+      // Continue without local storage
+    }
+    
+    return newVisitorId;
+  }
+  
+  // Generate or retrieve session ID (30 minutes)
+  function getSessionId() {
+    var sessionKey = 'zappy_session_' + config.websiteId;
+    var session = null;
+    
+    try {
+      session = sessionStorage.getItem(sessionKey);
+      if (session) {
+        var sessionData = JSON.parse(session);
+        var now = Date.now();
+        
+        // Check if session is still valid
+        if (now - sessionData.timestamp < config.sessionDuration) {
+          // Update timestamp
+          sessionData.timestamp = now;
+          sessionStorage.setItem(sessionKey, JSON.stringify(sessionData));
+          return sessionData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: SessionStorage not available');
+    }
+    
+    // Generate new session ID
+    var newSessionId = 'zs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      sessionStorage.setItem(sessionKey, JSON.stringify({
+        id: newSessionId,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      // Continue without session storage
+    }
+    
+    return newSessionId;
+  }
+  
+  var visitorId = getVisitorId();
+  var sessionId = getSessionId();
+  
+  // Track an event
+  function trackEvent(eventType, data) {
+    data = data || {};
+    
+    var eventData = {
+      website_id: config.websiteId,
+      event_type: eventType,
+      page_path: window.location.pathname,
+      referrer: document.referrer || 'direct',
+      visitor_id: visitorId,
+      session_id: sessionId,
+      metadata: data
+    };
+    
+    // Use sendBeacon if available (better for page unload events)
+    if (navigator.sendBeacon) {
+      var blob = new Blob([JSON.stringify(eventData)], { type: 'application/json' });
+      navigator.sendBeacon(config.apiUrl, blob);
+    } else {
+      // Fallback to fetch
+      fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventData),
+        keepalive: true
+      }).catch(function(error) {
+        console.warn('Zappy Analytics: Failed to track event', error);
+      });
+    }
+  }
+  
+  // Track page view
+  if (config.trackPageViews) {
+    trackEvent('pageview', {
+      title: document.title,
+      url: window.location.href
+    });
+  }
+  
+  // Track clicks on important elements
+  if (config.trackClicks) {
+    document.addEventListener('click', function(e) {
+      var target = e.target;
+      
+      // Track button clicks (counted as actions)
+      if (target.tagName === 'BUTTON' || target.closest('button')) {
+        var button = target.tagName === 'BUTTON' ? target : target.closest('button');
+        trackEvent('click', {
+          element: 'button',
+          text: button.textContent.trim().substring(0, 100),
+          id: button.id || null,
+          class: button.className || null
+        });
+      }
+      
+      // Track link clicks (navigation - not counted as actions)
+      else if (target.tagName === 'A' || target.closest('a')) {
+        var link = target.tagName === 'A' ? target : target.closest('a');
+        trackEvent('navigation', {
+          element: 'link',
+          text: link.textContent.trim().substring(0, 100),
+          href: link.href,
+          external: link.hostname !== window.location.hostname
+        });
+      }
+    }, true);
+  }
+  
+  // Track form submissions
+  if (config.trackFormSubmissions) {
+    document.addEventListener('submit', function(e) {
+      var form = e.target;
+      
+      trackEvent('form_submit', {
+        form_id: form.id || null,
+        form_name: form.name || null,
+        form_action: form.action || null,
+        form_method: form.method || 'GET'
+      });
+    }, true);
+  }
+  
+  // Track time on page (send on page unload)
+  var pageLoadTime = Date.now();
+  
+  window.addEventListener('beforeunload', function() {
+    var timeOnPage = Math.floor((Date.now() - pageLoadTime) / 1000); // in seconds
+    
+    trackEvent('page_unload', {
+      time_on_page: timeOnPage,
+      page_path: window.location.pathname
+    });
+  });
+  
+  // Expose tracking function globally for custom events
+  window.zappyAnalytics = {
+    track: trackEvent,
+    getVisitorId: function() { return visitorId; },
+    getSessionId: function() { return sessionId; }
+  };
+  
+})();
+</script>
+<!-- End Zappy Analytics -->
+    <meta property="og:title" content="שיווק דיגיטלי וסושיאל מדיא מנצח — סרטים חינוכים">
+  <meta property="og:description" content="הפכו את הרשתות החברתיות שלכם למנוע צמיחה עם אסטרטגיות שיווק דיגיטלי מתקדמות. התחילו לראות תוצאות אמיתיות עוד היום עם הפקות וידאו חינוכיות.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="he_IL">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="שיווק דיגיטלי וסושיאל מדיא מנצח — סרטים חינוכים">
+  <meta name="twitter:description" content="הפכו את הרשתות החברתיות שלכם למנוע צמיחה עם אסטרטגיות שיווק דיגיטלי מתקדמות. התחילו לראות תוצאות אמיתיות עוד היום עם הפקות וידאו חינוכיות.">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <!-- Cookie Consent -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.css">
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.umd.js"></script>
+    <!-- Mickidum Accessibility Toolbar -->
+    <script src="https://cdn.jsdelivr.net/gh/mickidum/acc_toolbar/acctoolbar/acctoolbar.min.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+
+    <style id="zappy-dropdown-submenu-styles">
+      /* ========== DESKTOP DROPDOWN SUBMENU STYLES ========== */
+      /* Base styles for dropdown submenus - parent must be positioned */
+      .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { position: relative; }
+      /* Submenu base - hidden by default */
+      .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { display: block !important; position: absolute !important; top: 100%; left: 0; min-width: 220px; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); padding: 8px 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.3s ease; z-index: 1000; list-style: none; pointer-events: none; }
+      /* CRITICAL: Desktop hover styles to show dropdown */
+      .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Submenu item styling */
+      .sub-menu li { list-style: none; margin: 0; padding: 0; }
+      .sub-menu a { display: block !important; padding: 10px 16px !important; color: #333 !important; font-weight: 500; text-decoration: none; white-space: nowrap; transition: background-color 0.2s; }
+      .sub-menu a:hover { background-color: #f5f5f5; }
+      /* RTL (Hebrew/Arabic) dropdown positioning */
+      [dir="rtl"] .nav-menu .sub-menu, [dir="rtl"] nav .sub-menu, [dir="rtl"] .navbar .sub-menu, html[lang="he"] .nav-menu .sub-menu, html[lang="he"] nav .sub-menu, html[lang="he"] .navbar .sub-menu, html[lang="ar"] .nav-menu .sub-menu, html[lang="ar"] nav .sub-menu, html[lang="ar"] .navbar .sub-menu { left: auto !important; right: 0 !important; }
+      /* Hide empty dropdown menus */
+      .sub-menu:empty, .sub-menu:not(:has(li:not(.zappy-hidden-menu-item))), .sub-menu:not(:has(li)) { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+      /* Desktop: show submenu on Menu Group hover */
+      li:has(.menu-group-title):hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Menu Group title styling */
+      .nav-menu > li > .menu-group-title, #navMenu > li > .menu-group-title { display: inline-block; padding: 0.5rem 1rem; cursor: default; user-select: none; }
+      
+      /* ========== MOBILE SUBMENU STYLES ========== */
+      @media (max-width: 768px) {
+        .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { position: static !important; transform: none !important; box-shadow: none !important; background: transparent !important; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; padding: 0 !important; border-radius: 0 !important; }
+        .sub-menu.mobile-expanded { max-height: 500px !important; opacity: 1 !important; visibility: visible !important; padding: 8px 0 8px 16px !important; }
+        [dir="rtl"] .sub-menu.mobile-expanded, html[lang="he"] .sub-menu.mobile-expanded { padding: 8px 16px 8px 0 !important; }
+        /* Disable hover behavior on mobile */
+        .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 0; visibility: hidden; pointer-events: none; }
+        .nav-menu li > .sub-menu.mobile-expanded, nav li > .sub-menu.mobile-expanded, .navbar li > .sub-menu.mobile-expanded, #navMenu li > .sub-menu.mobile-expanded { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+        .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { display: flex !important; flex-wrap: wrap !important; align-items: center !important; position: relative !important; min-height: 44px !important; }
+        .nav-menu li:has(.sub-menu) > a, nav li:has(.sub-menu) > a, .navbar li:has(.sub-menu) > a, #navMenu li:has(.sub-menu) > a { flex: 1 !important; min-width: 0 !important; }
+        .nav-menu li:has(.sub-menu) > .menu-group-title, nav li:has(.sub-menu) > .menu-group-title, .navbar li:has(.sub-menu) > .menu-group-title, #navMenu li:has(.sub-menu) > .menu-group-title { flex: 1 !important; min-width: 0 !important; padding: 0 !important; line-height: inherit !important; }
+        .nav-menu li:has(.sub-menu) > .sub-menu, nav li:has(.sub-menu) > .sub-menu, .navbar li:has(.sub-menu) > .sub-menu, #navMenu li:has(.sub-menu) > .sub-menu { flex-basis: 100% !important; width: 100% !important; }
+        .nav-menu li:has(.sub-menu) > a [class*="chevron"], .nav-menu li:has(.sub-menu) > a [class*="arrow"], .nav-menu li:has(.sub-menu) > a .fa-chevron-down, .nav-menu li:has(.sub-menu) > a .fa-angle-down, nav li:has(.sub-menu) > a [class*="chevron"], nav li:has(.sub-menu) > a [class*="arrow"], #navMenu li:has(.sub-menu) > a [class*="chevron"], #navMenu li:has(.sub-menu) > a [class*="arrow"] { display: none !important; visibility: hidden !important; }
+        .mobile-submenu-toggle { display: flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: auto !important; background: transparent !important; border: none !important; cursor: pointer !important; color: var(--text-dark) !important; position: static !important; flex-shrink: 0 !important; align-self: stretch !important; z-index: 2 !important; padding: 0 !important; margin: 0 !important; }
+        .mobile-submenu-toggle::after { content: '' !important; width: 0 !important; height: 0 !important; border-left: 6px solid transparent !important; border-right: 6px solid transparent !important; border-top: 7px solid currentColor !important; transition: transform 0.3s ease !important; }
+        .mobile-submenu-toggle.expanded::after { transform: rotate(180deg) !important; }
+        .sub-menu a { padding: 10px 0 !important; display: block !important; color: var(--text-dark) !important; }
+        .navbar .sub-menu li a, nav.navbar .sub-menu li a, .zappy-products-dropdown .sub-menu a { color: var(--text-dark) !important; }
+      }
+      @media (min-width: 769px) { .mobile-submenu-toggle { display: none !important; } }
+    </style>
+
+    <style id="zappy-widget-visibility">
+      #mic-access-tool-general-button, .mic-access-tool-general-button,
+      #mic-init-access-tool .mic-access-tool-general-button, #mic-init-access-tool #mic-access-tool-general-button,
+      ._access-icon, #mic-access-tool-box, .mic-access-tool-box,
+      #mic-init-access-tool #mic-access-tool-box, div[id*="mic-access-tool-box"], ._access-menu {
+        display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;
+      }
+    </style>
+</head>
+<body>
+
+  <nav class="navbar" dir="rtl">
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+    <svg class="hamburger-icon" width="24" height="24" viewbox="0 0 24 24" fill="none">
+      <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+    <svg class="close-icon" width="24" height="24" viewbox="0 0 24 24" fill="none" style="display:none;">
+      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+  </button>
+  
+  <button class="phone-header-btn" aria-label="Call">
+    <svg width="20" height="20" viewbox="0 0 24 24" fill="currentColor">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+    </svg>
+  </button>
+  
+  <div class="nav-container">
+    <div class="nav-brand">
+      <a href="/" class="logo-link">
+        <img class="logo" data-placeholder="logo" data-context="business logo" width="160" height="40" src="" alt="סרטים חינוכים">
+      </a>
+    </div>
+    
+    <ul class="nav-menu" id="navMenu"><li><a href="/channel">ערוץ</a></li><li><a href="/productions">הפקות</a></li></ul>
+    
+    <div class="nav-cta-container">
+      <a href="/contact" class="nav-cta-btn">צור קשר</a>
+    </div>
+  </div>
+</nav>
+  
+  <main>
+    <section class="index-hero-section" data-layout-spec="בית-hero" data-hero-type="fullscreen-scrim">
+  <!-- Background Image Layer -->
+  <img data-hero-bg="true" data-placeholder="index-hero-bg" data-context="Cinematic educational video production scene: modern film camera on tripod in a sleek studio setup with dramatic neon cyan and magenta accent lighting, professional video editing monitors displaying colorful timelines, clean minimalist aesthetic with deep blacks and subtle light beams, high-end production quality, educational content creation vibe" class="hero-bg-image" src="/assets/site-index-hero-bg.webp" alt="סטודיו הפקת סרטים חינוכיים מקצועי">
+  
+  <!-- Gradient Scrim Overlay -->
+  <div class="hero-scrim-overlay"></div>
+  
+  <!-- Content Overlay Group -->
+  <div class="hero-content-wrapper">
+    <div class="hero-content-container">
+      <h1 class="hero-headline">סרטים חינוכיים שמרגישים כמו קולנוע פרימיום</h1>
+      <h3 class="hero-subtitle">צפו בערוץ, למדו מהר, והפכו רעיונות לסיפורים ברורים ומשפיעים</h3>
+      <div class="hero-cta-row">
+        <a href="/channel" class="btn-hero-primary">צפו בסרטונים מומלצים</a>
+        <a href="/contact" class="btn-hero-secondary">בקשו הפקה</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bottom Divider: Diagonal Light Slice -->
+  <div class="index-hero-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 1200 60" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="hero-divider-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:rgba(0,229,255,0);stop-opacity:1"></stop>
+          <stop offset="35%" style="stop-color:rgba(0,229,255,0.75);stop-opacity:1"></stop>
+          <stop offset="65%" style="stop-color:rgba(0,229,255,0.75);stop-opacity:1"></stop>
+          <stop offset="100%" style="stop-color:rgba(0,229,255,0);stop-opacity:1"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M0,60 L0,25 L1200,35 L1200,60 Z" fill="#070A12"></path>
+      <path d="M0,25 L1200,35" stroke="url(#hero-divider-gradient)" stroke-width="2" fill="#070A12"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="index-showcase-section" data-layout-spec="בית-showcase">
+  <div class="showcase-container">
+    <div class="showcase-header">
+      <h2>התחל לצפות.</h2>
+      <p>אוסף שיעורים מעוצב במיוחד להיות מעשי, מהיר ובלתי נשכח מבחינה ויזואלית.</p>
+    </div>
+
+    <div class="showcase-grid">
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-1" data-context="Cinematic frame showing a person creating an engaging hook in the first 5 seconds of a video, dynamic camera angle, professional lighting, modern educational content creation" width="600" height="400" src="/assets/site-index-showcase-image-1.webp" alt="וידאו: הוק ב-5 שניות">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">04:12</span>
+          <span class="recommended-badge">מומלץ</span>
+        </div>
+        <div class="video-info">
+          <h3>הוק ב-5 שניות</h3>
+          <p>למד איך ליצור פתיחה שתופסת תשומת לב מיידית ומשאירה את הצופים מרותקים.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-2" data-context="Clean minimalist educational video frame showing clarity over complexity concept, simple visual hierarchy, professional educational setting" width="600" height="400" src="/assets/site-index-showcase-image-2.webp" alt="וידאו: בהירות על פני מורכבות">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">06:45</span>
+        </div>
+        <div class="video-info">
+          <h3>בהירות על פני מורכבות</h3>
+          <p>גלה למה תוכן פשוט ומובן תמיד מנצח על פני מידע מסובך ועמוס.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-3" data-context="Professional storyboard layout with sketches and planning notes, creative video production process, organized workflow" width="600" height="400" src="/assets/site-index-showcase-image-3.webp" alt="וידאו: יסודות תכנון סטורי בורד">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">08:20</span>
+          <span class="recommended-badge">מומלץ</span>
+        </div>
+        <div class="video-info">
+          <h3>יסודות תכנון סטורי בורד</h3>
+          <p>תכנן את הסרטון שלך בצורה מקצועית ומסודרת עוד לפני שמתחילים לצלם.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-4" data-context="Professional lighting setup creating trust and credibility, warm natural lighting on subject, cinematic educational video production" width="600" height="400" src="/assets/site-index-showcase-image-4.webp" alt="וידאו: תאורה שבונה אמון">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">05:30</span>
+        </div>
+        <div class="video-info">
+          <h3>תאורה שבונה אמון</h3>
+          <p>איך להשתמש בתאורה נכונה כדי ליצור תחושת מקצועיות ואמינות מיידית.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-5" data-context="High-quality audio recording setup with professional microphone, sound waves visualization, premium production quality" width="600" height="400" src="/assets/site-index-showcase-image-5.webp" alt="וידאו: סאונד שנשמע יקר">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">07:15</span>
+        </div>
+        <div class="video-info">
+          <h3>סאונד שנשמע יקר</h3>
+          <p>טכניקות פשוטות להקלטת אודיו שנשמע כמו הפקה בעלות אלפי דולרים.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-6" data-context="Dynamic video editing timeline showing rhythm and pacing, professional editing software interface, engaging content flow" width="600" height="400" src="/assets/site-index-showcase-image-6.webp" alt="וידאו: קצב עריכה">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">09:00</span>
+        </div>
+        <div class="video-info">
+          <h3>קצב עריכה</h3>
+          <p>שלוט בקצב הסרטון כדי לשמור על הצופים מעורבים מהתחלה ועד הסוף.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-7" data-context="Confident presenter on camera in professional setting, natural body language, engaging eye contact, educational video recording" width="600" height="400" src="/assets/site-index-showcase-image-7.webp" alt="וידאו: ביטחון מול המצלמה">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">06:00</span>
+        </div>
+        <div class="video-info">
+          <h3>ביטחון מול המצלמה</h3>
+          <p>טכניקות להרגיש נוח ולהיראות מקצועי גם אם זו הפעם הראשונה שלך מול המצלמה.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-8" data-context="Script to screen transformation process, from written document to final video production, professional workflow visualization" width="600" height="400" src="/assets/site-index-showcase-image-8.webp" alt="וידאו: מתסריט למסך">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">10:30</span>
+        </div>
+        <div class="video-info">
+          <h3>מתסריט למסך</h3>
+          <p>תהליך מלא מרגע הרעיון ועד לסרטון מוגמר שמוכן לפרסום.</p>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-thumbnail">
+          <img data-placeholder="index-showcase-image-9" data-context="Complete video production workflow from client brief to final delivery, professional project management, organized creative process" width="600" height="400" src="/assets/site-index-showcase-image-9.webp" alt="וידאו: מברייף למסירה">
+          <div class="play-overlay">
+            <svg data-no-icon-edit="true" aria-hidden="true" width="64" height="64" viewbox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="31" fill="rgba(0,229,255,0.25)" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M26 20L44 32L26 44V20Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <span class="duration-pill">12:45</span>
+        </div>
+        <div class="video-info">
+          <h3>מברייף למסירה</h3>
+          <p>נהל את כל תהליך ההפקה בצורה מקצועית ממפגש ראשון עם הלקוח ועד למסירה סופית.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div class="showcase-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 1200 60" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="filmstrip-glow">
+          <feGaussianBlur stddeviation="3" result="coloredBlur"></feGaussianBlur>
+          <feMerge>
+            <feMergeNode in="coloredBlur"></feMergeNode>
+            <feMergeNode in="SourceGraphic"></feMergeNode>
+          </feMerge>
+        </filter>
+      </defs>
+      <path d="M0,60 L0,30 Q20,28 40,30 L40,10 Q60,8 80,10 L80,30 Q100,28 120,30 L120,10 Q140,8 160,10 L160,30 Q180,28 200,30 L200,10 Q220,8 240,10 L240,30 Q260,28 280,30 L280,10 Q300,8 320,10 L320,30 Q340,28 360,30 L360,10 Q380,8 400,10 L400,30 Q420,28 440,30 L440,10 Q460,8 480,10 L480,30 Q500,28 520,30 L520,10 Q540,8 560,10 L560,30 Q580,28 600,30 L600,10 Q620,8 640,10 L640,30 Q660,28 680,30 L680,10 Q700,8 720,10 L720,30 Q740,28 760,30 L760,10 Q780,8 800,10 L800,30 Q820,28 840,30 L840,10 Q860,8 880,10 L880,30 Q900,28 920,30 L920,10 Q940,8 960,10 L960,30 Q980,28 1000,30 L1000,10 Q1020,8 1040,10 L1040,30 Q1060,28 1080,30 L1080,10 Q1100,8 1120,10 L1120,30 Q1140,28 1160,30 L1160,10 Q1180,8 1200,10 L1200,60 Z" fill="var(--bg-light)" filter="url(#filmstrip-glow)"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="index-capabilities-section" data-layout-spec="בית-capabilities">
+  <div class="index-capabilities-container">
+    <div class="index-capabilities-content-column">
+      <h2>איך הערוץ נוצר (ואיך נוכל להפיק את שלך)</h2>
+      <p class="index-capabilities-intro">מערכת הפקה חוזרת שמשמרת סיפורים חדים וויזואליה פרימיום.</p>
+      
+      <div class="index-capabilities-grid">
+        <div class="index-capabilities-tile">
+          <svg data-element-type="icon" data-icon-type="svg" class="index-capabilities-icon" width="40" height="40" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 12h24M8 20h24M8 28h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            <rect x="4" y="6" width="32" height="28" rx="2" stroke="currentColor" stroke-width="2" fill="none"></rect>
+          </svg>
+          <h3>תסריט ומבנה</h3>
+          <p>בניית עלילה עם נקודות מפנה, קצב ומסר ברור שמחזיק את הצופה מתחילה לסוף.</p>
+        </div>
+        
+        <div class="index-capabilities-tile">
+          <svg data-element-type="icon" data-icon-type="svg" class="index-capabilities-icon" width="40" height="40" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="8" width="28" height="20" rx="2" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <path d="M6 14h28M6 20h28" stroke="currentColor" stroke-width="2"></path>
+            <circle cx="12" cy="11" r="1.5" fill="currentColor"></circle>
+            <circle cx="18" cy="11" r="1.5" fill="currentColor"></circle>
+            <path d="M10 32l6-4 6 4 6-4 6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <h3>סטוריבורד</h3>
+          <p>תכנון ויזואלי של כל צילום – זוויות, תנועות מצלמה, מעברים – לפני שמדליקים אור.</p>
+        </div>
+        
+        <div class="index-capabilities-tile">
+          <svg data-element-type="icon" data-icon-type="svg" class="index-capabilities-icon" width="40" height="40" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="2" fill="none"></circle>
+            <circle cx="20" cy="20" r="6" stroke="currentColor" stroke-width="2" fill="none"></circle>
+            <path d="M20 6v4M20 30v4M6 20h4M30 20h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            <path d="M11 11l2.5 2.5M26.5 26.5l2.5 2.5M29 11l-2.5 2.5M13.5 26.5l-2.5 2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+          <h3>צילום ובימוי</h3>
+          <p>הנחיית מצלמה, שחקנים ודוברים עם דיוק קולנועי שמייצר נוכחות מסך חזקה.</p>
+        </div>
+        
+        <div class="index-capabilities-tile">
+          <svg data-element-type="icon" data-icon-type="svg" class="index-capabilities-icon" width="40" height="40" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 28V12l16 8-16 8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"></path>
+            <path d="M8 10v20M32 10v20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            <circle cx="20" cy="8" r="2" fill="currentColor"></circle>
+            <circle cx="20" cy="32" r="2" fill="currentColor"></circle>
+          </svg>
+          <h3>תאורה וסאונד</h3>
+          <p>תאורת סטודיו מדויקת ואודיו נקי שמבטיחים איכות שידור פרימיום בכל פריים.</p>
+        </div>
+        
+        <div class="index-capabilities-tile">
+          <svg data-element-type="icon" data-icon-type="svg" class="index-capabilities-icon" width="40" height="40" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="10" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <rect x="22" y="10" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <rect x="6" y="22" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <rect x="22" y="22" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"></rect>
+            <path d="M12 14h10M12 26h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+          <h3>עריכה ומושן</h3>
+          <p>חיתוך מדויק, קולור גרייד קולנועי, טקסטים אנימציה ומוזיקה שמרימים את הסיפור.</p>
+        </div>
+        
+        <div class="index-capabilities-tile">
+          <svg data-element-type="icon" data-icon-type="svg" class="index-capabilities-icon" width="40" height="40" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6v28M6 20h28" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            <circle cx="20" cy="20" r="8" stroke="currentColor" stroke-width="2" fill="none"></circle>
+            <path d="M20 12v8l5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle cx="10" cy="10" r="2" fill="currentColor"></circle>
+            <circle cx="30" cy="10" r="2" fill="currentColor"></circle>
+            <circle cx="10" cy="30" r="2" fill="currentColor"></circle>
+            <circle cx="30" cy="30" r="2" fill="currentColor"></circle>
+          </svg>
+          <h3>אסטרטגיית ערוץ</h3>
+          <p>תכנון תוכן, לוח זמנים, קריאייטיב ממוקד קהל ואופטימיזציה לפלטפורמות דיגיטל.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="index-capabilities-visual-column">
+      <div class="index-capabilities-image-frame">
+        <img data-placeholder="index-capabilities-studio-window" data-context="Cinematic behind-the-scenes shot of a professional video production studio: a camera operator filming in a modern studio with professional lighting equipment, soft key lights and rim lights creating dramatic atmosphere, a subject being interviewed or presenting in the background, monitors showing live footage, cables and production gear visible, high-contrast desaturated color grading with teal and orange tones, shallow depth of field, professional broadcast quality, editorial photography style, shot on cinema camera" width="600" height="750" src="/assets/site-index-capabilities-studio-window.webp" alt="אולפן הפקה מקצועי בעבודה">
+      </div>
+    </div>
+  </div>
+  
+  <div class="index-capabilities-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 1200 100" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="capabilitiesWaveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:var(--bg-light);stop-opacity:1"></stop>
+          <stop offset="100%" style="stop-color:var(--bg-dark);stop-opacity:1"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M0,100 L0,50 Q100,45 200,52 T400,48 Q500,52 600,45 T800,50 Q900,48 1000,52 T1200,48 L1200,100 Z" fill="#070A12"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="index-success-stories-section" data-layout-spec="בית-success-stories">
+  <div class="index-success-stories-container">
+    <div class="index-success-stories-header">
+      <h2>הוכחה דרך תוצאות.</h2>
+      <p>דוגמאות לאופן שבו תוכן חינוכי קולנועי משפר הבנה ופעולה.</p>
+    </div>
+
+    <div class="index-success-stories-grid">
+      <article class="index-success-story-card">
+        <div class="index-success-story-badge">חדש</div>
+        <h3>מבלבול לבהירות</h3>
+        <p>ארגון שעבר מהדרכות מסורבלות לסרטוני הסבר מרתקים שהפכו את תהליך האונבורדינג לחוויה מהנה.</p>
+        <div class="index-success-story-metrics">
+          <div class="index-success-metric-item">זמן הטמעה קצר יותר</div>
+          <div class="index-success-metric-item">שיעורי השלמה גבוהים יותר</div>
+          <div class="index-success-metric-item">שביעות רצון מוגברת</div>
+        </div>
+      </article>
+
+      <article class="index-success-story-card">
+        <h3>עקביות שבונה אמון</h3>
+        <p>מותג שהשקיע בסדרת סרטונים חינוכיים עקבית וראה שיפור משמעותי בנאמנות הקהל ובחזרה לצפייה.</p>
+        <div class="index-success-story-metrics">
+          <div class="index-success-metric-item">יותר צופים חוזרים</div>
+          <div class="index-success-metric-item">זיכרון מותג חזק יותר</div>
+          <div class="index-success-metric-item">מעורבות גבוהה בתכנים</div>
+        </div>
+      </article>
+
+      <article class="index-success-story-card">
+        <h3>חינוך שממיר</h3>
+        <p>עסק שגילה שסרטונים חינוכיים איכותיים לא רק מעבירים ידע, אלא גם מניעים לפעולה ומגדילים המרות.</p>
+        <div class="index-success-story-metrics">
+          <div class="index-success-metric-item">יותר פניות מתאימות</div>
+          <div class="index-success-metric-item">ביצועי קריאה לפעולה טובים יותר</div>
+          <div class="index-success-metric-item">ROI משופר</div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div class="index-success-stories-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 1200 80" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="index-success-divider-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#FF2DAA" stop-opacity="0.6"></stop>
+          <stop offset="50%" stop-color="#C300FF" stop-opacity="0.8"></stop>
+          <stop offset="100%" stop-color="#7C4DFF" stop-opacity="0.6"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M0,80 L0,50 L600,20 L1200,50 L1200,80 Z" fill="#0F1115"></path>
+      <path d="M0,50 L600,20 L1200,50" stroke="url(#index-success-divider-gradient)" stroke-width="2" fill="#0F1115"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="index-cta-section" data-layout-spec="בית-cta">
+  <div class="index-cta-container">
+    <div class="index-cta-content">
+      <h2 class="index-cta-headline">מוכנים להפוך ידע לערוץ?</h2>
+      <p class="index-cta-description">ספרו לנו מה אתם מלמדים ולמי אתם מלמדים — ואנחנו נעצב עבורכם מערכת וידאו קולנועית וחוזרת.</p>
+      <div class="index-cta-buttons">
+        <a href="/contact" class="index-cta-btn index-cta-btn-primary">צרו קשר</a>
+        <a href="/channel" class="index-cta-btn index-cta-btn-secondary">גלו את כל הסרטונים</a>
+      </div>
+      <p class="index-cta-reassurance">מענה תוך 1–2 ימי עסקים.</p>
+    </div>
+  </div>
+</section>
+  </main>
+  
+  <footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-top">
+      <div class="footer-column company-info">
+        <img class="logo" data-placeholder="logo" data-context="business logo" width="150" height="40" src="" alt="סרטים חינוכים">
+        <p class="company-description">יצירת תכנים חינוכיים איכוtiים המעשירים ומעוררים השראה</p>
+      </div>
+      
+      <div class="footer-column quick-links">
+        <h3>קישורים מהירים</h3>
+        <ul>
+          <li><a href="/channel">ערוץ</a></li>
+          <li><a href="/productions">הפקות</a></li>
+          <li><a href="/contact">צור קשר</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column contact-info">
+        <h3>יצירת קשר</h3>
+        <ul>
+          <li><i class="fas fa-envelope"></i> <a href="mailto:[business_email]">[business_email]</a></li>
+          <li><i class="fas fa-phone"></i> <a href="tel:[business_phone]">[business_phone]</a></li>
+          <li><a href="/"><i class="fas fa-map-marker-alt"></i> <span>[business_address]</span></a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column social-media">
+        <h3>עקבו אחרינו</h3>
+        <div class="social-links">
+          <a href="[facebook_handle]" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="[instagram_handle]" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="[whatsapp_handle]" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="copyright">
+        <p>© 2026 סרטים חינוכים. כל הזכויות שמורות.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/privacy">מדיניות פרטיות</a>
+        <span class="separator">|</span>
+        <a href="/terms">תנאי שימוש</a>
+        <span class="separator">|</span>
+        <a href="/accessibility">נגישות</a>
+        <span class="separator">|</span>
+        <a href="https://zappy5.com" target="_blank" class="zappy-attribution">נוצר באמצעות Zappy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+  
+  <a href="https://wa.me/[whatsapp_handle]" class="whatsapp-float" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  
+  <div data-integration="accessibility:toolbar"></div>
+
+    <script src="/script.js"></script>
+
+    <script id="zappy-mobile-submenu-script">
+    (function() {
+      function initMobileSubmenuToggles() {
+        if (window.innerWidth > 768) {
+          document.querySelectorAll('.mobile-submenu-toggle').forEach(function(btn) { btn.remove(); });
+          document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) { menu.classList.remove('mobile-expanded'); });
+          return;
+        }
+        var items = document.querySelectorAll('.nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu)');
+        items.forEach(function(li) {
+          if (li.querySelector('.mobile-submenu-toggle')) return;
+          var submenu = li.querySelector('.sub-menu');
+          var parentLink = li.querySelector(':scope > a');
+          if (!submenu || !parentLink) return;
+          var toggleBtn = document.createElement('button');
+          toggleBtn.className = 'mobile-submenu-toggle';
+          toggleBtn.setAttribute('aria-label', 'Toggle submenu');
+          toggleBtn.setAttribute('type', 'button');
+          parentLink.insertAdjacentElement('afterend', toggleBtn);
+          toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) {
+              if (menu !== submenu) { menu.classList.remove('mobile-expanded'); var t = menu.parentElement.querySelector('.mobile-submenu-toggle'); if(t) t.classList.remove('expanded'); }
+            });
+            submenu.classList.toggle('mobile-expanded');
+            toggleBtn.classList.toggle('expanded');
+          });
+        });
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMobileSubmenuToggles); }
+      else { initMobileSubmenuToggles(); }
+      var resizeTimer; window.addEventListener('resize', function() { clearTimeout(resizeTimer); resizeTimer = setTimeout(initMobileSubmenuToggles, 250); });
+      // Re-initialize when mobile menu becomes visible (MutationObserver)
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes') {
+            var target = mutation.target;
+            if (target.classList && (target.classList.contains('active') || target.classList.contains('open'))) {
+              setTimeout(initMobileSubmenuToggles, 100);
+            }
+          }
+        });
+      });
+      setTimeout(function() {
+        document.querySelectorAll('.mobile-menu, .nav-menu, #navMenu, nav').forEach(function(menu) {
+          observer.observe(menu, { attributes: true, attributeFilter: ['class', 'style'] });
+        });
+      }, 500);
+    })();
+    </script>
+
+    <script id="zappy-navbar-scroll-effect">
+    (function(){
+      var nb=document.querySelector('nav.navbar,.navbar:not(.zappy-catalog-menu)');
+      var cm=document.querySelector('.zappy-catalog-menu,#zappy-catalog-menu');
+      if(!nb)return;
+      var fb='rgba(15,17,21,0.85)';
+      var th=60;
+      var rs=getComputedStyle(document.documentElement);
+      var td=rs.getPropertyValue('--text-dark').trim()||'#1a1a1a';
+      var tl=rs.getPropertyValue('--text-light').trim()||'#ffffff';
+      var st=false?td:tl;
+      nb.style.transition='background 0.3s ease,backdrop-filter 0.3s ease,-webkit-backdrop-filter 0.3s ease,box-shadow 0.3s ease';
+      if(cm)cm.style.transition='background 0.3s ease,backdrop-filter 0.3s ease,-webkit-backdrop-filter 0.3s ease';
+      var neSel='a,.navbar-brand,.navbar-brand a,.dropdown-toggle,.mobile-toggle,.phone-header-btn,.mobile-hamburger-btn,.mobile-close-btn,.mobile-submenu-toggle,.nav-link';
+      var skipCls=['cart-link','login-link','nav-search-toggle','search-toggle'];
+      function sTC(c,clr){var els=c.querySelectorAll(neSel);for(var i=0;i<els.length;i++){var sk=false;for(var j=0;j<skipCls.length;j++){if(els[i].classList.contains(skipCls[j])){sk=true;break;}}if(!sk)els[i].style.setProperty('color',clr,'important');}}
+      function cTC(c){var els=c.querySelectorAll(neSel);for(var i=0;i<els.length;i++)els[i].style.removeProperty('color');}
+      function applyScrolled(){
+        nb.classList.add('scrolled');nb.style.setProperty('--frosted-text',st);
+        nb.style.setProperty('background-image','none','important');
+        nb.style.backdropFilter='blur(12px)';nb.style.webkitBackdropFilter='blur(12px)';nb.style.boxShadow='0 2px 16px rgba(0,0,0,0.12)';
+        sTC(nb,st);
+        if(window.innerWidth>768){nb.style.setProperty('background-color',fb,'important');}
+        if(cm){cm.classList.add('scrolled');cm.style.setProperty('background',fb,'important');cm.style.setProperty('backdrop-filter','blur(12px)','important');cm.style.setProperty('-webkit-backdrop-filter','blur(12px)','important');sTC(cm,st);}
+      }
+      function onS(){
+        if(window.innerWidth<=768){nb.classList.remove('scrolled');cTC(nb);if(cm){cm.classList.remove('scrolled');cTC(cm);}return;}
+        var y=window.scrollY||window.pageYOffset;
+        if(y>th){
+          nb.classList.add('scrolled');nb.style.setProperty('background-color',fb,'important');nb.style.setProperty('background-image','none','important');
+          nb.style.setProperty('--frosted-text',st);nb.style.backdropFilter='blur(12px)';nb.style.webkitBackdropFilter='blur(12px)';nb.style.boxShadow='0 2px 16px rgba(0,0,0,0.12)';
+          sTC(nb,st);
+          if(cm){cm.classList.add('scrolled');cm.style.setProperty('background',fb,'important');cm.style.setProperty('backdrop-filter','blur(12px)','important');cm.style.setProperty('-webkit-backdrop-filter','blur(12px)','important');sTC(cm,st);}
+        }else{
+          nb.classList.remove('scrolled');nb.style.setProperty('background-color','transparent','important');nb.style.removeProperty('background-image');
+          nb.style.removeProperty('--frosted-text');nb.style.backdropFilter='none';nb.style.webkitBackdropFilter='none';nb.style.boxShadow='none';
+          cTC(nb);
+          if(cm){cm.classList.remove('scrolled');cm.style.setProperty('background','transparent','important');cm.style.setProperty('backdrop-filter','none','important');cm.style.setProperty('-webkit-backdrop-filter','none','important');cTC(cm);}
+        }
+      }
+      function sLum(rv,gv,bv){rv/=255;gv/=255;bv/=255;rv=rv<=0.03928?rv/12.92:Math.pow((rv+0.055)/1.055,2.4);gv=gv<=0.03928?gv/12.92:Math.pow((gv+0.055)/1.055,2.4);bv=bv<=0.03928?bv/12.92:Math.pow((bv+0.055)/1.055,2.4);return 0.2126*rv+0.7152*gv+0.0722*bv;}
+      window.addEventListener('scroll',onS,{passive:true});
+      window.addEventListener('resize',onS,{passive:true});
+      onS();
+      var heroEl=document.querySelector('section[class*="hero"],[data-hero-type],main>section:first-child');
+      var hasDH=false;
+      if(heroEl){var hCs=getComputedStyle(heroEl);var hBI=hCs.backgroundImage;if(hBI&&hBI!=='none'){if(hBI.indexOf('url(')!==-1){var hM2=hCs.backgroundColor.match(/\d+/g);if(hM2&&hM2.length>=3){hasDH=sLum(parseInt(hM2[0]),parseInt(hM2[1]),parseInt(hM2[2]))<0.4;}else{hasDH=true;}}else if(hBI.indexOf('gradient')!==-1){var cM=hBI.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/g);if(cM&&cM.length>0){var tLm=0;for(var ci=0;ci<cM.length;ci++){var pts=cM[ci].match(/\d+/g);tLm+=sLum(parseInt(pts[0]),parseInt(pts[1]),parseInt(pts[2]));}hasDH=(tLm/cM.length)<0.4;}else{hasDH=true;}}else{hasDH=true;}}else{var hM=hCs.backgroundColor.match(/\d+/g);if(hM&&hM.length>=3){hasDH=sLum(parseInt(hM[0]),parseInt(hM[1]),parseInt(hM[2]))<0.4;}}}
+      if(!hasDH){window.removeEventListener('scroll',onS);window.removeEventListener('resize',onS);applyScrolled();}
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+# Business — Generative Engine Optimization Map
+
+---
+
+## Pages
+
+### בית
+https://example.com
+הפכו את הרשתות החברתיות שלכם למנוע צמיחה עם אסטרטגיות שיווק דיגיטלי מתקדמות. התחילו לראות תוצאות אמיתיות עוד היום עם הפקות וידאו חינוכיות.
+
+### ערוץ
+https://example.com/channel
+גלו מדריכים וטיפים מעשיים בשיווק דיגיטלי ושיווק שותפים למתחילים. למדו איך לבנות נוכחות מנצחת ברשתות החברתיות דרך תוכן וידאו איכותי שעובד.
+
+### הפקות
+https://example.com/productions
+שירותי הפקת וידאו מקצועיים לעסקים המחפשים להתבלט. צרו תוכן ויזואלי שמוכר, מסביר ומניע פעולה עם מומחי digital marketing services שלנו.
+
+### צור קשר
+https://example.com/contact
+מוכנים להעלות את השיווק הדיגיטלי שלכם לרמה הבאה? צרו קשר עכשיו לייעוץ אישי וגלו איך נוכל לעזור לכם להגיע ליעדים שלכם עם פתרונות מותאמים אישית.
+
+## Legal & Policy
+
+### Privacy Policy
+https://example.com/privacy
+Information about how user data is collected, stored, and protected.
+
+### Terms & Conditions
+https://example.com/terms
+Legal terms describing service usage, rights, and policies.
+
+### Accessibility Statement
+https://example.com/accessibility
+Information about WCAG compliance and accessibility features.
+
+---
+
+# Business Context (for LLM understanding)
+
+## About Business
+---
+
+# Additional Resources
+
+- **Sitemap**: https://example.com/sitemap.xml
+- **Robots.txt**: https://example.com/robots.txt
